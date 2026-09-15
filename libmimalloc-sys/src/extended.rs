@@ -236,7 +236,13 @@ extern "C" {
     /// Checked free: If `p` came from mimalloc's heap (as decided by
     /// [`mi_is_in_heap_region`]), this is [`mi_free(p)`](crate::mi_free), but
     /// otherwise it is a no-op.
+    #[cfg(feature = "v2")]
     pub fn mi_cfree(p: *mut c_void);
+
+    /// Checked free: frees `p` if it belongs to mimalloc and returns whether
+    /// the pointer was handled by mimalloc.
+    #[cfg(not(feature = "v2"))]
+    pub fn mi_cfree(p: *mut c_void) -> bool;
 
     /// Returns true if this is a pointer into a memory region that has been
     /// reserved by the mimalloc heap.
@@ -566,7 +572,7 @@ pub const mi_option_max_segment_reclaim: mi_option_t = 21;
 #[cfg(feature = "v2")]
 pub const _mi_option_last: mi_option_t = 38;
 #[cfg(not(feature = "v2"))]
-pub const _mi_option_last: mi_option_t = 47;
+pub const _mi_option_last: mi_option_t = 48;
 
 extern "C" {
     // Note: mi_option_{enable,disable} aren't exposed because they're redundant
